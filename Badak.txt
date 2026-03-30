@@ -1,0 +1,162 @@
+================================================================================
+                    FINANCEHUB: TECHNICAL DOCUMENTATION
+                    System Architecture & Cloud Infrastructure
+================================================================================
+
+1. PROJECT OVERVIEW
+------------------
+FinanceHub is an enterprise-grade banking application built to provide a seamless, 
+secure, and high-performance experience for retail banking customers. The system 
+allows users to manage multiple accounts (Savings, Checking, Premium), perform 
+instant transfers, and track transaction history with real-time analytics.
+
+Architecture Style: Modular Monolith
+The system currently follows a Modular Monolithic architecture. This means all business 
+logic (authentication, account management, transaction processing) resides within 
+a single Spring Boot deployment unit. This choice ensures lower latency for 
+inter-service communication and simplifies data consistency (ACID) during the 
+initial phases of growth.
+
+High-Level Workflow:
+1. Client (React/Vite) initiates a request over HTTPS.
+2. Spring Security intercepts the request for JWT validation.
+3. The request is routed to the appropriate REST Controller.
+4. The Service layer executes business logic and transaction management.
+5. The Repository layer (Spring Data JPA) persists changes to the MySQL database.
+6. A JSON response is returned to the client for UI updates via Axios.
+
+2. CLOUD INFRASTRUCTURE (CURRENT & PROPOSED)
+-------------------------------------------
+
+A. Current Production-Grade Infrastructure Concept (AWS)
+Assuming a migration to Amazon Web Services (AWS), the system is designed to run 
+within a highly available, multi-AZ (Availability Zone) environment.
+
+- Cloud Provider: Amazon Web Services (AWS).
+- Compute Services: AWS ECS (Elastic Container Service) with Fargate. This is 
+  a serverless container orchestration service that removes the need to manage 
+  underlying EC2 instances. It ensures the Spring Boot backend scales based 
+  on CPU/Memory demand.
+- Storage (Databases): Amazon RDS for MySQL. A managed database service that 
+  handles backups, patching, and failover automatically.
+- Storage (Files): Amazon S3 (Simple Storage Service) is used for storing 
+  customer documents (e.g., KYC uploads) and transaction statement PDFs.
+- Networking (VPC): A Virtual Private Cloud (VPC) with Public and Private 
+  subnets. The Database and Application servers reside in Private subnets to 
+  prevent direct internet exposure.
+- Security: IAM Roles (Identity and Access Management) are used to provide the 
+  ECS tasks with permission to access RDS and S3 without hardcoding credentials.
+
+B. Suggested Improvements & Additions (Scaling for millions)
+- Load Balancer: Application Load Balancer (ALB) to distribute incoming traffic 
+  across multiple containers in different Availability Zones.
+- Auto Scaling: Target-tracking scaling policies to increase the number of 
+  running containers during peak bank hours.
+- CDN (CloudFront): Used to cache the React frontend's static assets (JS, CSS, 
+  images) globally, reducing latency for users far from the origin server.
+- Monitoring (CloudWatch & Prometheus): Setup Cloudwatch Alarms for 5xx errors 
+  and Prometheus for granular JVM metrics (Heap usage, thread count).
+- CI/CD Pipeline: GitHub Actions or AWS CodePipeline to automate the "Build -> 
+  Test -> Dockerize -> Deploy" flow.
+- Backup & Recovery: Implement Cross-Region Replication for RDS to ensure data 
+  is safe even in the event of a total AWS Region failure.
+
+3. BACKEND (JAVA STACK)
+-----------------------
+
+- Framework: Spring Boot 3.2.x.
+  Chosen for its "Convention over Configuration" approach and powerful 
+  Spring Data/Security ecosystems.
+
+- Project Structure:
+  - Controllers: The API entry points. They handle HTTP request parsing and 
+    delegate to services.
+  - Services: The "Brain" of the application. Annotated with `@Service`, these 
+    classes contain business logic and are marked with `@Transactional` to ensure 
+    data integrity.
+  - Repositories: Interfaces extending `JpaRepository`. They leverage Spring Data 
+    to execute SQL without writing complex boilerplate.
+
+- API Design: RESTful.
+  Endpoints use standard HTTP methods:
+  - GET /api/transactions/account/{id} -> Retrieve transactions.
+  - POST /api/transactions/transfer -> Execute a funds transfer.
+
+- Exception Handling:
+  Implemented via `@ControllerAdvice`. This ensures that if a user tries to 
+  transfer more money than they have, the system returns a structured `400 Bad 
+  Request` instead of a generic crash.
+
+- Logging:
+  SLF4J with Logback. Logs are structured in JSON format to be easily parsed 
+  by log aggregation tools like ELK or Datadog.
+
+4. AUTHENTICATION & AUTHORIZATION (JWT)
+--------------------------------------
+
+JWT (JSON Web Token) is used for stateless authentication. This is crucial for 
+cloud scalability as the server doesn't need to store session state in memory.
+
+Anatomy of a JWT:
+1. Header: Algorithm (HS256) and Type (JWT).
+2. Payload: Claims such as UserID, Email, and Expiry timestamp.
+3. Signature: A cryptographic hash of (Header + Payload + Secret Key) to prevent 
+   tampering.
+
+Security Flow (Step-by-Step):
+1. User provides credentials (email/password) to `/api/auth/login`.
+2. Backend validates password via BCrypt.
+3. Backend generates a JWT signed with a 256-bit secret key.
+4. Client receives the token and stores it in LocalStorage or a Secure Cookie.
+5. For every subsequent request, the Client sends the token in the 
+   `Authorization: Bearer <token>` header.
+6. Spring Security Filter intercepts the request, validates the signature, 
+   and extracts the user identity.
+
+Common Vulnerabilities & Prevention:
+- XSS: Prevented by using HttpOnly cookies for tokens.
+- Token Theft: Prevented by using short expiration times and Refresh Tokens.
+- Algorithm Mimicry: Explicitly set the accepted algorithm to HS256 in the 
+  validator.
+
+5. DATABASE DESIGN
+-----------------
+- Type: MySQL 8 (Relational Database).
+- Schema Design:
+  - User Table: Stores profile info and hashed passwords.
+  - Account Table: Linked to User via UserID (1:N). Stores balance and currency.
+  - Transaction Table: Linked to Account via AccountID (1:N). Stores amounts 
+    and transaction status.
+  - Role Table: Defines permissions (CUSTOMER, ADMIN).
+
+- Optimization:
+  - Clustered Index: Automatically created on Primary Keys (id).
+  - Secondary Indexes: Created on `email` and `account_number` for O(1) lookups.
+  - ACID Compliance: Ensures that a transfer (Debit From A, Credit To B) either 
+    completes fully or not at all.
+
+6. API FLOW (END-TO-END)
+-----------------------
+Client (Request) -> ALB (Proxy) -> Spring Security (JWT Auth) -> 
+Controller -> Service (Business Logic) -> Persistence Layer -> 
+MySQL (Commit) -> Response Sent Back to UI.
+
+7. FUTURE ENHANCEMENTS
+---------------------
+- Microservices: Splitting the Monolith into 'Auth-Service', 'Transaction-Service', 
+  and 'Account-Service' using Spring Cloud.
+- Redis Caching: Using an In-Memory cache for account balances to reduce RDS 
+  load for frequent balance checks.
+- Event-Driven Architecture: Using RabbitMQ or Kafka to send email notifications 
+  asynchronously after a transaction completes.
+
+8. CONCLUSION
+------------
+FinanceHub is built on a foundation of security and scalability. By leveraging 
+Spring Boot's maturity and modern cloud infrastructure patterns, the system 
+is ready to scale from a single developer's machine to a production banking 
+environment handling thousands of concurrent users.
+
+================================================================================
+                        END OF DOCUMENTATION
+================================================================================

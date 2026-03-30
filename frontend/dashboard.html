@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FinanceHub — Dashboard</title>
+  <meta name="description" content="Your FinanceHub account dashboard — balances, transactions, and quick actions."/>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+<div class="app-layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon">💎</div>
+      <div class="sidebar-logo-text">FinanceHub</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-label">Main</div>
+      <a href="dashboard.html" class="nav-link active">
+        <span class="nav-icon">🏠</span> Dashboard
+      </a>
+      <a href="transfer.html" class="nav-link">
+        <span class="nav-icon">💸</span> Transfer Money
+      </a>
+      <a href="transactions.html" class="nav-link">
+        <span class="nav-icon">📋</span> Transactions
+      </a>
+      <div id="admin-nav-section" class="hidden">
+        <div class="nav-label">Management</div>
+        <a href="admin.html" class="nav-link">
+          <span class="nav-icon">⚙️</span> Admin Panel
+        </a>
+      </div>
+    </nav>
+    <div class="sidebar-user">
+      <div class="user-avatar" id="sidebar-avatar"></div>
+      <div class="user-info">
+        <div class="user-name" id="sidebar-name"></div>
+        <div id="sidebar-role"></div>
+      </div>
+      <button class="logout-btn" onclick="logout()" title="Sign out">⏻</button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+
+    <!-- Greeting -->
+    <div class="greeting-section">
+      <div class="greeting-text">
+        <span id="greeting-text">Good morning</span>,
+        <span class="name-highlight" id="greeting-name"></span> 👋
+      </div>
+      <div class="live-clock" id="live-clock"></div>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="stat-grid">
+      <div class="stat-card gold">
+        <div class="stat-icon">💰</div>
+        <div class="stat-label">Total Balance</div>
+        <div class="stat-value" id="stat-balance"><span class="skeleton skeleton-value">&nbsp;</span></div>
+        <div class="stat-sub" id="stat-currency">USD</div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-icon">🏦</div>
+        <div class="stat-label">Account Number</div>
+        <div class="stat-value mono" id="stat-account-num" style="font-size:1rem;"><span class="skeleton skeleton-value">&nbsp;</span></div>
+        <div class="stat-sub" id="stat-account-type"></div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-icon">📊</div>
+        <div class="stat-label">Account Type</div>
+        <div class="stat-value" id="stat-account-type-val"><span class="skeleton skeleton-value">&nbsp;</span></div>
+        <div class="stat-sub">Active</div>
+      </div>
+      <div class="stat-card purple">
+        <div class="stat-icon">🔄</div>
+        <div class="stat-label">Transactions</div>
+        <div class="stat-value" id="stat-tx-count"><span class="skeleton skeleton-value">&nbsp;</span></div>
+        <div class="stat-sub">Total recorded</div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="card-header mb-md">
+      <div>
+        <div class="card-title">Quick Actions</div>
+        <div class="card-subtitle">Manage your account efficiently</div>
+      </div>
+    </div>
+    <div class="quick-actions mb-md">
+      <a href="transfer.html" class="quick-action-btn">
+        <span class="qa-icon">💸</span>
+        <span>Transfer Money</span>
+      </a>
+      <a href="transactions.html" class="quick-action-btn">
+        <span class="qa-icon">📋</span>
+        <span>View Transactions</span>
+      </a>
+      <button class="quick-action-btn" onclick="showToast('Statement download available in Phase 2 🚀', 'info')">
+        <span class="qa-icon">📄</span>
+        <span>Download Statement</span>
+      </button>
+      <button class="quick-action-btn" onclick="showToast('Bill Pay launching in Phase 2 🚀', 'info')">
+        <span class="qa-icon">💳</span>
+        <span>Pay Bills</span>
+      </button>
+    </div>
+
+    <!-- Recent Transactions -->
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Recent Transactions</div>
+          <div class="card-subtitle">Your last 5 transactions</div>
+        </div>
+        <a href="transactions.html" class="btn btn-ghost btn-sm">View All</a>
+      </div>
+      <div class="table-wrap">
+        <table id="recent-tx-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Description</th>
+              <th>Type</th>
+              <th>Counterparty</th>
+              <th style="text-align:right">Amount</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="recent-tx-body">
+            <tr><td colspan="6" style="text-align:center;padding:32px;color:var(--text-muted);">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="toast-container" class="toast-container"></div>
+<script src="js/api.js"></script>
+<script src="js/dashboard.js"></script>
+</body>
+</html>

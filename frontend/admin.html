@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FinanceHub — Admin Panel</title>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+<div class="app-layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon">💎</div>
+      <div class="sidebar-logo-text">FinanceHub</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-label">Main</div>
+      <a href="dashboard.html" class="nav-link"><span class="nav-icon">🏠</span> Dashboard</a>
+      <a href="transfer.html" class="nav-link"><span class="nav-icon">💸</span> Transfer Money</a>
+      <a href="transactions.html" class="nav-link"><span class="nav-icon">📋</span> Transactions</a>
+      <div class="nav-label">Management</div>
+      <a href="admin.html" class="nav-link active"><span class="nav-icon">⚙️</span> Admin Panel</a>
+    </nav>
+    <div class="sidebar-user">
+      <div class="user-avatar" id="sidebar-avatar"></div>
+      <div class="user-info">
+        <div class="user-name" id="sidebar-name"></div>
+        <div id="sidebar-role"></div>
+      </div>
+      <button class="logout-btn" onclick="logout()" title="Sign out">⏻</button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="page-header">
+      <h1>Admin Panel</h1>
+      <p>Manage users, accounts, transactions, and audit logs</p>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="tab-nav admin-tabs">
+      <button class="tab-btn active" id="tab-users-btn" onclick="switchTab('users',this)">👥 Users</button>
+      <button class="tab-btn" id="tab-accounts-btn" onclick="switchTab('accounts',this)">🏦 Accounts</button>
+      <button class="tab-btn" id="tab-transactions-btn" onclick="switchTab('transactions',this)">🔄 Transactions</button>
+      <button class="tab-btn" id="tab-logs-btn" onclick="switchTab('logs',this)">📝 Logs</button>
+    </div>
+
+    <!-- Users Tab -->
+    <div class="tab-panel active card" id="tab-users">
+      <div class="card-header">
+        <div class="card-title">All Users</div>
+        <div id="users-count" class="text-muted"></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th><th>Full Name</th><th>Email</th><th>Role</th><th>Status</th><th>Joined</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="users-body">
+            <tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text-muted);">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Accounts Tab -->
+    <div class="tab-panel card hidden" id="tab-accounts">
+      <div class="card-header">
+        <div class="card-title">All Accounts</div>
+        <div id="accounts-count" class="text-muted"></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Account #</th><th>Owner</th><th>Type</th><th>Balance</th><th>Currency</th><th>Status</th><th>Created</th>
+            </tr>
+          </thead>
+          <tbody id="accounts-body">
+            <tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text-muted);">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Transactions Tab -->
+    <div class="tab-panel card hidden" id="tab-transactions">
+      <div class="card-header">
+        <div class="card-title">All Transactions</div>
+        <div id="transactions-count" class="text-muted"></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Ref #</th><th>From</th><th>To</th><th>Amount</th><th>Type</th><th>Status</th><th>Date</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="transactions-body">
+            <tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text-muted);">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Logs Tab -->
+    <div class="tab-panel card hidden" id="tab-logs">
+      <div class="card-header">
+        <div class="card-title">Audit Logs</div>
+        <div id="logs-count" class="text-muted"></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th><th>User</th><th>Action</th><th>Details</th><th>IP</th><th>Status</th><th>Time</th>
+            </tr>
+          </thead>
+          <tbody id="logs-body">
+            <tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text-muted);">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="toast-container" class="toast-container"></div>
+<script src="js/api.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

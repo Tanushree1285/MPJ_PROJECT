@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FinanceHub — Transfer Money</title>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+<div class="app-layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon">💎</div>
+      <div class="sidebar-logo-text">FinanceHub</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-label">Main</div>
+      <a href="dashboard.html" class="nav-link"><span class="nav-icon">🏠</span> Dashboard</a>
+      <a href="transfer.html" class="nav-link active"><span class="nav-icon">💸</span> Transfer Money</a>
+      <a href="transactions.html" class="nav-link"><span class="nav-icon">📋</span> Transactions</a>
+      <div id="admin-nav-section" class="hidden">
+        <div class="nav-label">Management</div>
+        <a href="admin.html" class="nav-link"><span class="nav-icon">⚙️</span> Admin Panel</a>
+      </div>
+    </nav>
+    <div class="sidebar-user">
+      <div class="user-avatar" id="sidebar-avatar"></div>
+      <div class="user-info">
+        <div class="user-name" id="sidebar-name"></div>
+        <div id="sidebar-role"></div>
+      </div>
+      <button class="logout-btn" onclick="logout()" title="Sign out">⏻</button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="page-header">
+      <h1>Transfer Money</h1>
+      <p>Send funds to any FinanceHub account instantly</p>
+    </div>
+
+    <!-- Step Indicator -->
+    <div class="step-indicator" id="step-indicator">
+      <div class="step active" id="step-1">
+        <span class="step-num">1</span>
+        <span>Enter Details</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step" id="step-2">
+        <span class="step-num">2</span>
+        <span>Confirm</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step" id="step-3">
+        <span class="step-num">3</span>
+        <span>Success</span>
+      </div>
+    </div>
+
+    <div class="transfer-grid">
+      <!-- Left: Form -->
+      <div>
+        <!-- Step 1: Enter details -->
+        <div class="card" id="panel-step1">
+          <form id="transfer-form">
+            <div class="form-group">
+              <label for="receiverAccountNumber">Receiver Account Number</label>
+              <input type="text" id="receiverAccountNumber" placeholder="e.g. FH-100002-2025" required/>
+            </div>
+            <div class="form-group">
+              <label for="amount">Amount (USD)</label>
+              <input type="number" id="amount" placeholder="0.00" min="0.01" step="0.01" required/>
+            </div>
+            <div class="form-group">
+              <label for="description">Description (optional)</label>
+              <input type="text" id="description" placeholder="e.g. Rent payment"/>
+            </div>
+            <button type="submit" class="btn btn-gold btn-block" id="preview-btn">
+              Preview Transfer →
+            </button>
+          </form>
+        </div>
+
+        <!-- Step 2: Confirm -->
+        <div class="card hidden" id="panel-step2">
+          <h3 style="margin-bottom:20px;">Confirm Transfer</h3>
+          <div class="summary-row"><span class="summary-label">From Account</span><span class="summary-value mono" id="confirm-from"></span></div>
+          <div class="summary-row"><span class="summary-label">To Account</span><span class="summary-value mono" id="confirm-to"></span></div>
+          <div class="summary-row"><span class="summary-label">Amount</span><span class="summary-value amount-negative" id="confirm-amount"></span></div>
+          <div class="summary-row"><span class="summary-label">Description</span><span class="summary-value" id="confirm-desc"></span></div>
+          <div class="summary-row"><span class="summary-label">Remaining Balance</span><span class="summary-value amount-positive" id="confirm-remaining"></span></div>
+          <div style="display:flex;gap:12px;margin-top:24px;">
+            <button class="btn btn-ghost" onclick="goToStep1()">← Back</button>
+            <button class="btn btn-gold" style="flex:1;" id="confirm-btn" onclick="executeTransfer()">
+              Confirm Transfer
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 3: Success -->
+        <div class="card hidden" id="panel-step3">
+          <div class="success-animation">
+            <div class="success-check">✓</div>
+            <h2 style="margin-bottom:8px;">Transfer Successful!</h2>
+            <p class="text-muted" style="margin-bottom:24px;">Your funds have been transferred successfully.</p>
+            <div class="summary-row"><span class="summary-label">Reference Number</span><span class="summary-value mono" id="success-ref" style="color:var(--accent-gold);"></span></div>
+            <div style="display:flex;gap:12px;margin-top:28px;justify-content:center;">
+              <a href="dashboard.html" class="btn btn-ghost">← Dashboard</a>
+              <button class="btn btn-gold" onclick="resetTransfer()">New Transfer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Live Summary -->
+      <div>
+        <div class="transfer-summary-card">
+          <h3 style="margin-bottom:20px;font-size:1rem;">Transfer Summary</h3>
+          <div class="summary-row">
+            <span class="summary-label">Your Balance</span>
+            <span class="summary-value mono" id="sum-balance">—</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Transfer Amount</span>
+            <span class="summary-value amount-negative" id="sum-amount">$0.00</span>
+          </div>
+          <div class="divider"></div>
+          <div class="summary-row">
+            <span class="summary-label">After Transfer</span>
+            <span class="summary-value summary-total" id="sum-remaining">—</span>
+          </div>
+          <div style="margin-top:16px;padding:12px;background:var(--bg-input);border-radius:var(--radius-sm);">
+            <p style="font-size:0.78rem;color:var(--text-muted);line-height:1.5;">
+              ✅ Transfers are instant and atomic — both accounts update simultaneously or not at all.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="toast-container" class="toast-container"></div>
+<script src="js/api.js"></script>
+<script src="js/transfer.js"></script>
+</body>
+</html>

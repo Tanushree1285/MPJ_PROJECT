@@ -1,0 +1,38 @@
+# ==============================================================================
+# FinanceHub — System Requirements & Dependencies
+# ==============================================================================
+
+# 🖥️ System Requirements
+# ------------------------------------------------------------------------------
+Java=17.x (OpenJDK or Oracle)
+Maven=3.8+
+Node.js=18.x or 20.x (LTS recommended)
+MySQL=8.x
+NPM=9.x or 10.x
+
+# 📦 Backend Dependencies (Spring Boot)
+# ------------------------------------------------------------------------------
+spring-boot-starter-web=3.2.3
+spring-boot-starter-security=3.2.3
+spring-boot-starter-data-jpa=3.2.3
+spring-boot-starter-validation=3.2.3
+spring-boot-starter-mail=3.2.3
+mysql-connector-j=8.x
+jjwt=0.12.3
+lombok=1.18.x
+spring-dotenv=4.0.0
+
+# 🎨 Frontend Dependencies (Vite + React)
+# ------------------------------------------------------------------------------
+react=18.2.0
+react-dom=18.2.0
+vite=5.1.4
+axios=1.6.7
+framer-motion=11.0.8
+lucide-react=0.344.0
+react-router-dom=6.22.2
+tailwindcss=3.4.1
+typescript=5.2.2
+jspdf=4.2.1
+jspdf-autotable=5.0.7
+react-hot-toast=2.4.1
