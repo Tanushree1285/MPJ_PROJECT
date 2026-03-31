@@ -44,20 +44,6 @@ A premium digital banking experience with a Spring Boot backend, MySQL database,
 
 ---
 
-## 🔑 Default Credentials
-All accounts use the password: **`Password123!`**
-
-| Role | Email | Password | Purpose |
-| :--- | :--- | :--- | :--- |
-| **ADMIN** | `admin.user@financehub.com` | `admin000` | Full management access |
-| **EMPLOYEE** | `emp.user@financehub.com` | `emp789` | Manage users & approve transfers |
-| **CUSTOMER** | `john.doe@financehub.com` | `john123` | Regular banking ($15,420 balance) |
-| **CUSTOMER** | `jane.smith@financehub.com` | `jane456` | Regular banking ($8,750 balance) |
-| **CUSTOMER** | `roshni.gupta@financehub.com`| `roshni111`| Regular banking (New User) |
-| **AUDITOR** | `audit.user@financehub.com` | `audit999` | View-only audit logs |
-
----
-
 ## 📡 API Endpoints (Prefix: `/api`)
 
 ### Auth
