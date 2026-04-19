@@ -4,6 +4,7 @@ import { User, Mail, Phone, Lock, Save, Camera, Shield, Bell, CreditCard, Calend
 import Input from '../components/common/Input';
 import Button from '../components/common/Button';
 import { useAuth } from '../context/AuthContext';
+import QrPayments from '../components/features/QrPayments';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 
@@ -273,15 +274,9 @@ const Profile: React.FC = () => {
           )}
 
           {activeTab === 'payment' && (
-            <div className="glass-card p-10 rounded-3xl border-none shadow-premium">
-              <h3 className="text-2xl font-display font-bold text-slate-900 mb-8">Payment Methods</h3>
-              <div className="p-6 border-2 border-dashed border-slate-200 rounded-3xl text-center">
-                <div className="w-16 h-16 bg-slate-50 text-slate-300 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <CreditCard size={32} />
-                </div>
-                <p className="text-slate-400 font-bold mb-4">No cards linked yet</p>
-                <Button variant="secondary" icon={<Plus size={18} />}>Add New Card</Button>
-              </div>
+            <div className="animate-fadeIn">
+              <h3 className="text-2xl font-display font-bold text-slate-900 mb-8 px-2">Payment Methods</h3>
+              <QrPayments />
             </div>
           )}
 

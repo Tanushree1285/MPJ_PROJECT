@@ -25,6 +25,8 @@ public class AccountService {
         String accountNumber = "FH-" + String.format("%06d", new java.util.Random().nextInt(999999))
                 + "-" + java.time.LocalDateTime.now().getYear();
 
+        boolean isFirstAccount = accountRepository.findByUserId(user.getId()).isEmpty();
+
         Account account = Account.builder()
                 .user(user)
                 .accountNumber(accountNumber)
@@ -32,6 +34,7 @@ public class AccountService {
                 .balance(java.math.BigDecimal.ZERO)
                 .currency("USD")
                 .isActive(true)
+                .isPrimary(isFirstAccount)
                 .build();
         
         account = accountRepository.save(account);
@@ -45,11 +48,15 @@ public class AccountService {
     }
 
     public AccountResponse getPrimaryByUserId(Long userId) {
-        List<Account> accounts = accountRepository.findByUserId(userId);
-        if (accounts.isEmpty()) {
-            throw new ResourceNotFoundException("No accounts found for user: " + userId);
-        }
-        return toResponse(accounts.get(0));
+        return accountRepository.findByUserIdAndIsPrimary(userId, true)
+                .map(AccountService::toResponse)
+                .orElseGet(() -> {
+                    List<Account> accounts = accountRepository.findByUserId(userId);
+                    if (accounts.isEmpty()) {
+                        throw new ResourceNotFoundException("No accounts found for user: " + userId);
+                    }
+                    return toResponse(accounts.get(0));
+                });
     }
 
     public AccountResponse getByAccountNumber(String accountNumber) {
@@ -76,6 +83,7 @@ public class AccountService {
                 .userId(account.getUser() != null ? account.getUser().getId() : null)
                 .userFullName(account.getUser() != null ? account.getUser().getFullName() : null)
                 .userEmail(account.getUser() != null ? account.getUser().getEmail() : null)
+                .isPrimary(account.getIsPrimary())
                 .build();
     }
 }

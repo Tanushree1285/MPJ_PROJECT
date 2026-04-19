@@ -3,7 +3,9 @@
 .env.local
 .env.*.local
 backend/.env
-frontend-modern/.env
+frontend/.env
+BCryptTest.java
+Badak.txt
 
 # Node.js / Vite
 node_modules/

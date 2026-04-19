@@ -19,4 +19,5 @@ public class AccountResponse {
     private Long userId;
     private String userFullName;
     private String userEmail;
+    private Boolean isPrimary;
 }

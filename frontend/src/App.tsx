@@ -11,6 +11,7 @@ import Accounts from './pages/Accounts'
 import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
 import AuditorPanel from './pages/AuditorPanel'
+import LandingPage from './pages/LandingPage'
 import { AuthProvider, useAuth } from './context/AuthContext'
 
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -32,7 +33,7 @@ function AppRoutes() {
       <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
       <Route path="/admin" element={<PrivateRoute><AdminPanel /></PrivateRoute>} />
       <Route path="/auditor" element={<PrivateRoute><AuditorPanel /></PrivateRoute>} />
-      <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route path="/" element={<LandingPage />} />
     </Routes>
   );
 }
@@ -40,7 +41,7 @@ function AppRoutes() {
 function App() {
   return (
     <AuthProvider>
-      <Router>
+      <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Toaster position="top-right" toastOptions={{
           duration: 4000,
           style: {

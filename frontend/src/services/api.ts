@@ -7,6 +7,22 @@ const api = axios.create({
   },
 });
 
+// Request interceptor to add auth token
+api.interceptors.request.use((config) => {
+  const savedUser = localStorage.getItem('zbUser');
+  if (savedUser) {
+    try {
+      const { token } = JSON.parse(savedUser);
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    } catch (e) {
+      console.error('Error parsing storage for auth token');
+    }
+  }
+  return config;
+});
+
 // Response interceptor to handle errors globally
 api.interceptors.response.use(
   (response) => response,

@@ -27,8 +27,9 @@ interface Account {
 
 const Accounts: React.FC = () => {
   const { user } = useAuth();
-  const [account, setAccount] = useState<Account | null>(null);
+  const [accounts, setAccounts] = useState<Account[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
   const [isManageModalOpen, setIsManageModalOpen] = useState(false);
   const [isViewDetailsOpen, setIsViewDetailsOpen] = useState(false);
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
@@ -39,14 +40,14 @@ const Accounts: React.FC = () => {
   const [accountType, setAccountType] = useState('CHECKING');
 
   useEffect(() => {
-    const fetchAccount = async (uid: number) => {
+    const fetchAccounts = async (uid: number) => {
       try {
         setLoading(true);
-        // Use primary account endpoint
-        const res = await api.get(`/accounts/primary/${uid}`);
-        setAccount(res.data);
+        // Fetch all accounts for the user
+        const res = await api.get(`/accounts/${uid}`);
+        setAccounts(res.data);
       } catch (err: any) {
-        console.error('Account fetch error:', err);
+        console.error('Accounts fetch error:', err);
         toast.error('Failed to load account details');
       } finally {
         setLoading(false);
@@ -54,7 +55,7 @@ const Accounts: React.FC = () => {
     };
     
     const uid = user?.id || (user as any)?.userId;
-    if (uid) fetchAccount(uid);
+    if (uid) fetchAccounts(uid);
   }, [user]);
 
   const handleToggleFreeze = () => {
@@ -84,6 +85,9 @@ const Accounts: React.FC = () => {
     setIsRequestModalOpen(false);
   };
 
+  const primaryAccount = accounts.length > 0 ? accounts[0] : null;
+  const secondaryAccounts = accounts.slice(1);
+
   return (
     <DashboardLayout title="My Accounts">
       <div className="space-y-8">
@@ -96,12 +100,15 @@ const Accounts: React.FC = () => {
                   <CreditCard size={28} />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-display font-bold text-slate-900">{account?.accountType} Account</h3>
-                  <p className="text-slate-400 font-bold text-xs uppercase tracking-widest mt-1">Primay Account</p>
+                  <h3 className="text-2xl font-display font-bold text-slate-900">{primaryAccount?.accountType || 'Loading...'} Account</h3>
+                  <p className="text-slate-400 font-bold text-xs uppercase tracking-widest mt-1">Primary Account</p>
                 </div>
               </div>
               <button 
-                onClick={() => setIsManageModalOpen(true)}
+                onClick={() => {
+                  setSelectedAccount(primaryAccount);
+                  setIsManageModalOpen(true);
+                }}
                 className="p-3 bg-slate-50 text-slate-400 rounded-2xl hover:bg-slate-100 hover:text-slate-600 transition-all border border-slate-100"
               >
                 <Settings size={20} />
@@ -112,7 +119,7 @@ const Accounts: React.FC = () => {
               <div>
                 <p className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">Available Balance</p>
                 <h2 className="text-5xl font-display font-bold text-slate-900 tracking-tight">
-                  {account?.currency || 'USD'} {(account?.balance ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                  {primaryAccount?.currency || 'USD'} {(primaryAccount?.balance ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                 </h2>
               </div>
 
@@ -120,12 +127,12 @@ const Accounts: React.FC = () => {
                 <div>
                   <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Account Number</p>
                   <p className="font-mono font-bold text-slate-700 tracking-wider">
-                    {account?.accountNumber ? account.accountNumber.split('-').map((p, i) => i === 1 ? '••••••' : p).join('-') : '••••-••••-••••'}
+                    {primaryAccount?.accountNumber ? primaryAccount.accountNumber.split('-').map((p, i) => i === 1 ? '••••••' : p).join('-') : '••••-••••-••••'}
                   </p>
                 </div>
                 <div>
                   <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Currency</p>
-                  <p className="font-bold text-slate-700">{account?.currency}</p>
+                  <p className="font-bold text-slate-700">{primaryAccount?.currency}</p>
                 </div>
               </div>
             </div>
@@ -134,14 +141,20 @@ const Accounts: React.FC = () => {
               <Button 
                 fullWidth 
                 className="py-4 font-bold text-base shadow-lg shadow-primary-500/20"
-                onClick={() => setIsManageModalOpen(true)}
+                onClick={() => {
+                  setSelectedAccount(primaryAccount);
+                  setIsManageModalOpen(true);
+                }}
               >
                 Manage Account
               </Button>
               <Button 
                 variant="secondary" 
                 className="px-6 py-4 border-slate-200"
-                onClick={() => setIsViewDetailsOpen(true)}
+                onClick={() => {
+                  setSelectedAccount(primaryAccount);
+                  setIsViewDetailsOpen(true);
+                }}
               >
                 <Eye size={20} />
               </Button>
@@ -167,7 +180,7 @@ const Accounts: React.FC = () => {
                  </li>
                  <li className="flex items-center gap-3">
                    <div className="w-1.5 h-1.5 bg-primary-400 rounded-full" />
-                   Premium 24/7 priority support
+                   Dedicated 24/7 business support
                  </li>
                </ul>
             </div>
@@ -195,6 +208,54 @@ const Accounts: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* Secondary Accounts */}
+        {secondaryAccounts.map(acc => (
+          <div key={acc.id} className="glass-card p-8 rounded-[40px] border-none shadow-premium bg-white group hover:scale-[1.01] transition-all">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+              <div className="flex items-center gap-6">
+                <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center shadow-sm">
+                  <CreditCard size={32} />
+                </div>
+                <div>
+                  <h4 className="text-xl font-display font-bold text-slate-900">{acc.accountType} Account</h4>
+                  <p className="font-mono text-slate-400 text-sm font-bold tracking-widest mt-1">
+                    {acc.accountNumber.split('-').map((p, i) => i === 1 ? '••••••' : p).join('-')}
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-12 text-right">
+                <div>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Available Balance</p>
+                  <p className="text-2xl font-display font-bold text-slate-900">
+                    {acc.currency} {acc.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => {
+                      setSelectedAccount(acc);
+                      setIsViewDetailsOpen(true);
+                    }}
+                    className="p-3 bg-slate-50 text-slate-400 rounded-2xl hover:bg-indigo-50 hover:text-indigo-600 transition-all border border-slate-100"
+                  >
+                    <Eye size={20} />
+                  </button>
+                  <button 
+                     onClick={() => {
+                        setSelectedAccount(acc);
+                        setIsManageModalOpen(true);
+                      }}
+                    className="p-3 bg-slate-50 text-slate-400 rounded-2xl hover:bg-slate-100 hover:text-slate-600 transition-all border border-slate-100"
+                  >
+                    <Settings size={20} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
 
         {/* Pending Accounts */}
         {pendingAccounts.map(pc => (
@@ -304,7 +365,7 @@ const Accounts: React.FC = () => {
             <div className="p-10 space-y-6">
               <div className="space-y-1">
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Account Number</p>
-                <p className="font-mono font-bold text-lg text-slate-700">{account?.accountNumber}</p>
+                <p className="font-mono font-bold text-lg text-slate-700">{selectedAccount?.accountNumber}</p>
               </div>
               <div className="grid grid-cols-2 gap-8">
                 <div className="space-y-1">
@@ -324,7 +385,7 @@ const Accounts: React.FC = () => {
             <div className="p-10 bg-slate-50 flex gap-4">
               <button 
                 onClick={() => {
-                  navigator.clipboard.writeText(account?.accountNumber || '');
+                  navigator.clipboard.writeText(selectedAccount?.accountNumber || '');
                   toast.success('Account number copied!');
                 }}
                 className="flex-1 py-4 bg-white text-slate-700 border border-slate-200 rounded-2xl font-bold hover:bg-slate-100 transition-all"

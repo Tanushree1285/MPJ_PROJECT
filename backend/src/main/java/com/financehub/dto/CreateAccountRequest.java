@@ -9,5 +9,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CreateAccountRequest {
     private Long userId;
-    private String accountType; // SAVINGS, CHECKING, PREMIUM
+    private String accountType; // SAVINGS, CHECKING, BUSINESS
 }
