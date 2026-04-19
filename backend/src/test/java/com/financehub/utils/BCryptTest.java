@@ -11,7 +11,7 @@ public class BCryptTest {
     @Test
     public void generateHashes() throws Exception {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        String[] pwds = {"john123", "jane456", "emp789", "admin000", "audit999", "roshni111"};
+        String[] pwds = {"john1234", "jane456", "emp789", "admin000", "audit999", "roshni111"};
         List<String> lines = new ArrayList<>();
         for (String p : pwds) {
             lines.add(p + ":" + encoder.encode(p));
