@@ -21,6 +21,8 @@ mysql-connector-j=8.x
 jjwt=0.12.3
 lombok=1.18.x
 spring-dotenv=4.0.0
+zxing-core=3.5.3
+zxing-javase=3.5.3
 
 # 🎨 Frontend Dependencies (Vite + React)
 # ------------------------------------------------------------------------------
@@ -36,3 +38,7 @@ typescript=5.2.2
 jspdf=4.2.1
 jspdf-autotable=5.0.7
 react-hot-toast=2.4.1
+html5-qrcode=2.3.8
+spline-react=4.1.0
+clsx=2.1.0
+tailwind-merge=2.2.1
