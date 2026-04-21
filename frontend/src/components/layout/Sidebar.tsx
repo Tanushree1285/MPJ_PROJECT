@@ -10,7 +10,8 @@ import {
   ShieldCheck, 
   LogOut,
   X,
-  ClipboardList
+  ClipboardList,
+  PiggyBank
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -26,6 +27,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
     { name: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
     { name: 'Transactions', icon: ArrowRightLeft, path: '/transactions' },
     { name: 'My Accounts', icon: Wallet, path: '/accounts' },
+    { name: 'Savings Vaults', icon: PiggyBank, path: '/vaults' },
     { name: 'Profile', icon: User, path: '/profile' },
   ];
 

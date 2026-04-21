@@ -74,3 +74,13 @@
 .delay-400 {
   animation-delay: 0.4s;
 }
+
+/* Vault liquid-fill shimmer */
+@keyframes shimmer {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
+.animate-shimmer {
+  animation: shimmer 2.2s ease-in-out infinite;
+}

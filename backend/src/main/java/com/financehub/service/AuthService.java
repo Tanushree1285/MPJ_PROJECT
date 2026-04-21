@@ -28,6 +28,7 @@ public class AuthService {
     private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JavaMailSender mailSender;
+    private final LogService logService;
 
     @Value("${app.frontend.url}")
     private String frontendUrl;
@@ -36,7 +37,7 @@ public class AuthService {
     private int expiryMinutes;
 
     @Transactional
-    public AuthResponse register(RegisterRequest request) {
+    public AuthResponse register(RegisterRequest request, String ipAddress) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new DuplicateUserException("Email already registered: " + request.getEmail());
         }
@@ -71,6 +72,9 @@ public class AuthService {
                 .build();
         account = accountRepository.save(account);
 
+        // Log registration
+        logService.logAction(user, "REGISTER", "New user registered with email: " + user.getEmail(), ipAddress, "SUCCESS");
+
         return AuthResponse.builder()
                 .token("phase1-token-" + user.getId())
                 .email(user.getEmail())
@@ -81,20 +85,29 @@ public class AuthService {
                 .build();
     }
 
-    public AuthResponse login(LoginRequest request) {
+    public AuthResponse login(LoginRequest request, String ipAddress) {
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new ResourceNotFoundException("No account found with email: " + request.getEmail()));
+                .orElseGet(() -> {
+                    // Log failure if user not found (be careful with sensitive details)
+                    logService.logAction(null, "LOGIN_FAILURE", "Login failed: Email not found - " + request.getEmail(), ipAddress, "FAILED");
+                    throw new ResourceNotFoundException("Invalid email or password");
+                });
 
         if (!user.getIsActive()) {
+            logService.logAction(user, "LOGIN_FAILURE", "Login failed: Account deactivated", ipAddress, "FAILED");
             throw new ResourceNotFoundException("Account is deactivated. Please contact support.");
         }
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            logService.logAction(user, "LOGIN_FAILURE", "Login failed: Invalid password", ipAddress, "FAILED");
             throw new ResourceNotFoundException("Invalid email or password");
         }
 
         List<Account> accounts = accountRepository.findByUserId(user.getId());
         Account account = accounts.isEmpty() ? null : accounts.get(0);
+
+        // Log success
+        logService.logAction(user, "LOGIN_SUCCESS", "User logged in successfully", ipAddress, "SUCCESS");
 
         return AuthResponse.builder()
                 .token("phase1-token-" + user.getId())
@@ -107,7 +120,7 @@ public class AuthService {
     }
 
     @Transactional
-    public void forgotPassword(ForgotPasswordRequest request) {
+    public void forgotPassword(ForgotPasswordRequest request, String ipAddress) {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException("No account found with email: " + request.getEmail()));
 
@@ -137,14 +150,16 @@ public class AuthService {
                 + "— The FinanceHub Team");
         try {
             mailSender.send(mail);
+            logService.logAction(user, "FORGOT_PASSWORD", "Password reset link sent to: " + user.getEmail(), ipAddress, "SUCCESS");
         } catch (Exception e) {
+            logService.logAction(user, "FORGOT_PASSWORD", "Failed to send reset link to: " + user.getEmail(), ipAddress, "FAILED");
             e.printStackTrace();  // 🔥 THIS will show real error
             throw new RuntimeException("Email failed");
         }
     }
 
     @Transactional
-    public void resetPassword(ResetPasswordRequest request) {
+    public void resetPassword(ResetPasswordRequest request, String ipAddress) {
         PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(request.getToken())
                 .orElseThrow(() -> new InvalidTokenException("Invalid or expired reset token"));
 
@@ -161,5 +176,7 @@ public class AuthService {
 
         resetToken.setUsed(true);
         passwordResetTokenRepository.save(resetToken);
+
+        logService.logAction(user, "RESET_PASSWORD", "Password reset successfully completed", ipAddress, "SUCCESS");
     }
 }

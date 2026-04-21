@@ -26,28 +26,43 @@ interface LogEntry {
   userId: number;
 }
 
+interface Transaction {
+  id: number;
+  amount: number;
+  status: string;
+  type: string;
+  description: string;
+  referenceNumber: string;
+  createdAt: string;
+  senderAccountNumber: string;
+  receiverAccountNumber: string;
+}
+
 const AuditorPanel: React.FC = () => {
   const [logs, setLogs] = useState<LogEntry[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterAction, setFilterAction] = useState('ALL');
 
   useEffect(() => {
-    const fetchLogs = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
-        // Assuming there's a global logs endpoint or an admin one
-        const res = await api.get('/logs/all');
-        setLogs(res.data);
+        const [logsRes, txRes] = await Promise.all([
+          api.get('/logs/all'),
+          api.get('/transactions/all')
+        ]);
+        setLogs(logsRes.data);
+        setTransactions(txRes.data);
       } catch (err: any) {
-        console.error('Logs fetch error:', err);
-        // Fallback for demo if endpoint fails
-        toast.error('Failed to load system logs');
+        console.error('Audit fetch error:', err);
+        toast.error('Failed to load audit data');
       } finally {
         setLoading(false);
       }
     };
-    fetchLogs();
+    fetchData();
   }, []);
 
   const filteredLogs = logs.filter(log => {
@@ -139,7 +154,9 @@ const AuditorPanel: React.FC = () => {
               </div>
               <div>
                 <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Security Alerts</p>
-                <p className="text-2xl font-display font-bold text-slate-900">0</p>
+                <p className="text-2xl font-display font-bold text-slate-900">
+                  {transactions.filter(t => t.status === 'SUSPICIOUS').length}
+                </p>
               </div>
             </div>
           </div>
@@ -155,6 +172,62 @@ const AuditorPanel: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* Suspicious Transactions Section */}
+        {transactions.filter(t => t.status === 'SUSPICIOUS').length > 0 && (
+          <div className="space-y-4">
+            <h3 className="text-xl font-display font-bold text-slate-900 flex items-center gap-2">
+              <ShieldAlert className="text-amber-500" size={20} />
+              Flagged Transactions (Action Required)
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {transactions.filter(t => t.status === 'SUSPICIOUS').map(tx => (
+                <div key={tx.id} className="glass-card p-6 rounded-3xl bg-white border border-amber-100 shadow-premium">
+                  <div className="flex justify-between items-start mb-4">
+                    <span className="px-2 py-1 bg-amber-50 text-amber-700 rounded-lg text-[10px] font-bold uppercase tracking-wider">
+                      Flagged by Heuristics
+                    </span>
+                    <span className="text-xs font-mono text-slate-400">#{tx.referenceNumber}</span>
+                  </div>
+                  <div className="space-y-1 mb-6">
+                    <p className="text-2xl font-display font-bold text-slate-900">${tx.amount.toLocaleString()}</p>
+                    <p className="text-xs text-slate-500 font-medium">{tx.senderAccountNumber} → {tx.receiverAccountNumber}</p>
+                  </div>
+                  <div className="flex gap-3">
+                    <button 
+                      onClick={async () => {
+                        try {
+                          await api.patch(`/transactions/${tx.id}/approve`);
+                          toast.success('Transaction approved and funds released');
+                          setTransactions(transactions.map(t => t.id === tx.id ? { ...t, status: 'COMPLETED' } : t));
+                        } catch (err: any) {
+                          toast.error(err.response?.data?.message || 'Approval failed');
+                        }
+                      }}
+                      className="flex-1 py-2 bg-primary-600 text-white rounded-xl text-xs font-bold hover:bg-primary-700 transition-all font-display"
+                    >
+                      Approve
+                    </button>
+                    <button 
+                      onClick={async () => {
+                        try {
+                          await api.patch(`/transactions/${tx.id}/decline`);
+                          toast.error('Transaction declined');
+                          setTransactions(transactions.map(t => t.id === tx.id ? { ...t, status: 'FAILED' } : t));
+                        } catch (err: any) {
+                          toast.error('Decline action failed');
+                        }
+                      }}
+                      className="flex-1 py-2 bg-slate-50 text-slate-500 rounded-xl text-xs font-bold hover:bg-slate-100 transition-all font-display"
+                    >
+                      Decline
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Filters */}
         <div className="flex flex-col md:flex-row gap-4 justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-slate-100">

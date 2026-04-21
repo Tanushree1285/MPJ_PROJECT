@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import DashboardLayout from '../components/layout/DashboardLayout';
-import { 
-  CreditCard, 
-  ShieldCheck, 
-  History, 
+import {
+  CreditCard,
+  ShieldCheck,
+  History,
   ArrowRight,
   Plus,
   Eye,
@@ -25,10 +25,18 @@ interface Account {
   createdAt: string;
 }
 
+interface Summary {
+  monthlyIncome: number;
+  monthlyExpense: number;
+  currency: string;
+  monthAndYear: string;
+}
+
 const Accounts: React.FC = () => {
   const { user } = useAuth();
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [loading, setLoading] = useState(true);
+  const [summary, setSummary] = useState<Summary | null>(null);
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
   const [isManageModalOpen, setIsManageModalOpen] = useState(false);
   const [isViewDetailsOpen, setIsViewDetailsOpen] = useState(false);
@@ -46,6 +54,11 @@ const Accounts: React.FC = () => {
         // Fetch all accounts for the user
         const res = await api.get(`/accounts/${uid}`);
         setAccounts(res.data);
+
+        if (res.data.length > 0) {
+          const summaryRes = await api.get(`/transactions/summary/${res.data[0].id}`);
+          setSummary(summaryRes.data);
+        }
       } catch (err: any) {
         console.error('Accounts fetch error:', err);
         toast.error('Failed to load account details');
@@ -53,7 +66,7 @@ const Accounts: React.FC = () => {
         setLoading(false);
       }
     };
-    
+
     const uid = user?.id || (user as any)?.userId;
     if (uid) fetchAccounts(uid);
   }, [user]);
@@ -77,7 +90,7 @@ const Accounts: React.FC = () => {
     const updated = [...pendingAccounts, newPending];
     setPendingAccounts(updated);
     localStorage.setItem('fhPendingAccounts', JSON.stringify(updated));
-    
+
     toast.success('Account application received! Our team is reviewing your request.', {
       icon: '📝',
       duration: 5000
@@ -104,7 +117,7 @@ const Accounts: React.FC = () => {
                   <p className="text-slate-400 font-bold text-xs uppercase tracking-widest mt-1">Primary Account</p>
                 </div>
               </div>
-              <button 
+              <button
                 onClick={() => {
                   setSelectedAccount(primaryAccount);
                   setIsManageModalOpen(true);
@@ -138,8 +151,8 @@ const Accounts: React.FC = () => {
             </div>
 
             <div className="mt-12 flex gap-4">
-              <Button 
-                fullWidth 
+              <Button
+                fullWidth
                 className="py-4 font-bold text-base shadow-lg shadow-primary-500/20"
                 onClick={() => {
                   setSelectedAccount(primaryAccount);
@@ -148,8 +161,8 @@ const Accounts: React.FC = () => {
               >
                 Manage Account
               </Button>
-              <Button 
-                variant="secondary" 
+              <Button
+                variant="secondary"
                 className="px-6 py-4 border-slate-200"
                 onClick={() => {
                   setSelectedAccount(primaryAccount);
@@ -164,25 +177,25 @@ const Accounts: React.FC = () => {
           {/* Account Perks & Stats */}
           <div className="space-y-6">
             <div className="glass-card p-8 rounded-3xl border-none shadow-premium bg-gradient-to-br from-slate-800 to-slate-900 text-white relative overflow-hidden">
-               <div className="absolute top-0 right-0 -mr-12 -mt-12 w-48 h-48 bg-primary-600/20 rounded-full blur-2xl" />
-               <h4 className="text-lg font-display font-bold mb-4 flex items-center gap-2">
-                 <ShieldCheck className="text-primary-400" size={20} />
-                 Account Benefits
-               </h4>
-               <ul className="space-y-4 text-slate-400 text-sm font-medium">
-                 <li className="flex items-center gap-3">
-                   <div className="w-1.5 h-1.5 bg-primary-400 rounded-full" />
-                   Zero fees on incoming transfers
-                 </li>
-                 <li className="flex items-center gap-3">
-                   <div className="w-1.5 h-1.5 bg-primary-400 rounded-full" />
-                   Up to 3.5% APY on savings
-                 </li>
-                 <li className="flex items-center gap-3">
-                   <div className="w-1.5 h-1.5 bg-primary-400 rounded-full" />
-                   Dedicated 24/7 business support
-                 </li>
-               </ul>
+              <div className="absolute top-0 right-0 -mr-12 -mt-12 w-48 h-48 bg-primary-600/20 rounded-full blur-2xl" />
+              <h4 className="text-lg font-display font-bold mb-4 flex items-center gap-2">
+                <ShieldCheck className="text-primary-400" size={20} />
+                Account Benefits
+              </h4>
+              <ul className="space-y-4 text-slate-400 text-sm font-medium">
+                <li className="flex items-center gap-3">
+                  <div className="w-1.5 h-1.5 bg-primary-400 rounded-full" />
+                  Zero fees on incoming transfers
+                </li>
+                <li className="flex items-center gap-3">
+                  <div className="w-1.5 h-1.5 bg-primary-400 rounded-full" />
+                  Up to 3.5% APY on savings
+                </li>
+                <li className="flex items-center gap-3">
+                  <div className="w-1.5 h-1.5 bg-primary-400 rounded-full" />
+                  Dedicated 24/7 business support
+                </li>
+              </ul>
             </div>
 
             <div className="glass-card p-8 rounded-3xl border-none shadow-premium">
@@ -192,12 +205,16 @@ const Accounts: React.FC = () => {
               </h4>
               <div className="space-y-6">
                 <div className="flex justify-between items-center text-sm">
-                  <span className="text-slate-500 font-medium">Total Income (March)</span>
-                  <span className="font-bold text-green-600">+$12,450.00</span>
+                  <span className="text-slate-500 font-medium">Total Income ({summary?.monthAndYear || '...'})</span>
+                  <span className="font-bold text-green-600">
+                    +{summary ? `${summary.currency} ${summary.monthlyIncome.toLocaleString(undefined, { minimumFractionDigits: 2 })}` : '$0.00'}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center text-sm">
-                  <span className="text-slate-500 font-medium">Total Spending (March)</span>
-                  <span className="font-bold text-red-600">-$4,120.50</span>
+                  <span className="text-slate-500 font-medium">Total Spending ({summary?.monthAndYear || '...'})</span>
+                  <span className="font-bold text-red-600">
+                    -{summary ? `${summary.currency} ${summary.monthlyExpense.toLocaleString(undefined, { minimumFractionDigits: 2 })}` : '$0.00'}
+                  </span>
                 </div>
                 <div className="pt-4 border-t border-slate-50 flex justify-center">
                   <button className="text-primary-600 font-bold text-sm tracking-tight hover:underline flex items-center gap-1">
@@ -224,7 +241,7 @@ const Accounts: React.FC = () => {
                   </p>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-12 text-right">
                 <div>
                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Available Balance</p>
@@ -233,7 +250,7 @@ const Accounts: React.FC = () => {
                   </p>
                 </div>
                 <div className="flex gap-2">
-                  <button 
+                  <button
                     onClick={() => {
                       setSelectedAccount(acc);
                       setIsViewDetailsOpen(true);
@@ -242,11 +259,11 @@ const Accounts: React.FC = () => {
                   >
                     <Eye size={20} />
                   </button>
-                  <button 
-                     onClick={() => {
-                        setSelectedAccount(acc);
-                        setIsManageModalOpen(true);
-                      }}
+                  <button
+                    onClick={() => {
+                      setSelectedAccount(acc);
+                      setIsManageModalOpen(true);
+                    }}
                     className="p-3 bg-slate-50 text-slate-400 rounded-2xl hover:bg-slate-100 hover:text-slate-600 transition-all border border-slate-100"
                   >
                     <Settings size={20} />
@@ -286,8 +303,8 @@ const Accounts: React.FC = () => {
             <h4 className="text-lg font-display font-bold text-slate-900">Open a new account</h4>
             <p className="text-slate-500 text-sm max-w-xs font-medium">Easily open a secondary checking or savings account for different purposes.</p>
           </div>
-          <Button 
-            variant="secondary" 
+          <Button
+            variant="secondary"
             className="px-8 border-slate-200"
             onClick={() => setIsRequestModalOpen(true)}
           >
@@ -310,7 +327,7 @@ const Accounts: React.FC = () => {
             </div>
 
             <div className="space-y-4">
-              <button 
+              <button
                 onClick={handleToggleFreeze}
                 className="w-full p-6 bg-slate-50 hover:bg-slate-100 rounded-3xl border border-slate-100 transition-all flex items-center justify-between group"
               >
@@ -343,7 +360,7 @@ const Accounts: React.FC = () => {
             </div>
 
             <div className="mt-8">
-              <button 
+              <button
                 onClick={() => setIsManageModalOpen(false)}
                 className="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold hover:bg-slate-800 shadow-xl shadow-slate-900/20 transition-all"
               >
@@ -383,7 +400,7 @@ const Accounts: React.FC = () => {
               </div>
             </div>
             <div className="p-10 bg-slate-50 flex gap-4">
-              <button 
+              <button
                 onClick={() => {
                   navigator.clipboard.writeText(selectedAccount?.accountNumber || '');
                   toast.success('Account number copied!');
@@ -392,7 +409,7 @@ const Accounts: React.FC = () => {
               >
                 Copy Details
               </button>
-              <button 
+              <button
                 onClick={() => setIsViewDetailsOpen(false)}
                 className="flex-1 py-4 bg-primary-600 text-white rounded-2xl font-bold hover:bg-primary-700 shadow-lg shadow-primary-500/20 transition-all"
               >
@@ -414,18 +431,17 @@ const Accounts: React.FC = () => {
               <h2 className="text-2xl font-display font-bold text-slate-900">Apply for New Account</h2>
               <p className="text-slate-500 font-medium">Choose your account type and get started</p>
             </div>
-            
+
             <div className="px-10 pb-10 space-y-4">
               <div className="grid grid-cols-1 gap-3">
                 {['CHECKING', 'SAVINGS', 'BUSINESS'].map(type => (
                   <button
                     key={type}
                     onClick={() => setAccountType(type)}
-                    className={`p-6 rounded-3xl border-2 text-left transition-all ${
-                      accountType === type 
-                        ? 'border-primary-500 bg-primary-50/50' 
+                    className={`p-6 rounded-3xl border-2 text-left transition-all ${accountType === type
+                        ? 'border-primary-500 bg-primary-50/50'
                         : 'border-slate-100 bg-slate-50 hover:border-slate-200'
-                    }`}
+                      }`}
                   >
                     <p className={`font-bold ${accountType === type ? 'text-primary-700' : 'text-slate-900'}`}>{type} Account</p>
                     <p className="text-xs text-slate-500 mt-1">
@@ -438,14 +454,14 @@ const Accounts: React.FC = () => {
               </div>
 
               <div className="pt-6">
-                <Button 
-                  fullWidth 
+                <Button
+                  fullWidth
                   className="py-4 shadow-xl shadow-primary-500/20"
                   onClick={handleRequestAccount}
                 >
                   Submit Application
                 </Button>
-                <button 
+                <button
                   onClick={() => setIsRequestModalOpen(false)}
                   className="w-full mt-4 text-sm font-bold text-slate-400 hover:text-slate-600 transition-all"
                 >

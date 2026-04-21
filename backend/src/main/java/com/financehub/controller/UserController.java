@@ -24,8 +24,9 @@ public class UserController {
 
     @PutMapping("/{id}")
     public ResponseEntity<UserResponse> update(@PathVariable("id") Long id,
-                                               @RequestBody UpdateUserRequest request) {
-        return ResponseEntity.ok(userService.updateProfile(id, request));
+                                               @RequestBody UpdateUserRequest request,
+                                               jakarta.servlet.http.HttpServletRequest httpRequest) {
+        return ResponseEntity.ok(userService.updateProfile(id, request, getClientIp(httpRequest)));
     }
 
     @GetMapping("/all")
@@ -34,14 +35,22 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Map<String, String>> deactivate(@PathVariable("id") Long id) {
-        userService.deactivate(id);
+    public ResponseEntity<Map<String, String>> deactivate(@PathVariable("id") Long id,
+                                                          jakarta.servlet.http.HttpServletRequest httpRequest) {
+        userService.deactivate(id, getClientIp(httpRequest));
         return ResponseEntity.ok(Map.of("message", "User deactivated successfully"));
     }
 
     @PatchMapping("/{id}/role")
     public ResponseEntity<UserResponse> updateRole(@PathVariable("id") Long id,
-                                                   @RequestParam("roleName") String roleName) {
-        return ResponseEntity.ok(userService.updateRole(id, roleName));
+                                                   @RequestParam("roleName") String roleName,
+                                                   jakarta.servlet.http.HttpServletRequest httpRequest) {
+        return ResponseEntity.ok(userService.updateRole(id, roleName, getClientIp(httpRequest)));
+    }
+
+    private String getClientIp(jakarta.servlet.http.HttpServletRequest request) {
+        String xf = request.getHeader("X-Forwarded-For");
+        if (xf != null && !xf.isEmpty()) return xf.split(",")[0].trim();
+        return request.getRemoteAddr();
     }
 }

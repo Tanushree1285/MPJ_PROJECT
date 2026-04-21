@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, ArrowRight, DollarSign, User as UserIcon, CheckCircle2, AlertCircle } from 'lucide-react';
+import { X, ArrowRight, DollarSign, User as UserIcon, CheckCircle2, AlertCircle, ShieldAlert } from 'lucide-react';
 import Input from '../common/Input';
 import Button from '../common/Button';
 import api from '../../services/api';
@@ -15,6 +15,7 @@ interface TransferModalProps {
 const TransferModal: React.FC<TransferModalProps> = ({ isOpen, onClose, senderUserId, onSuccess }) => {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [txnStatus, setTxnStatus] = useState<string>('COMPLETED');
   const [formData, setFormData] = useState({
     receiverAccountNumber: '',
     amount: '',
@@ -32,12 +33,13 @@ const TransferModal: React.FC<TransferModalProps> = ({ isOpen, onClose, senderUs
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      await api.post('/transactions/transfer', {
+      const res = await api.post('/transactions/transfer', {
         senderUserId,
         receiverAccountNumber: formData.receiverAccountNumber,
         amount: parseFloat(formData.amount),
         description: formData.description || 'Fund Transfer'
       });
+      setTxnStatus(res.data.status);
       setStep(3);
       if (onSuccess) onSuccess();
     } catch (err: any) {
@@ -133,17 +135,34 @@ const TransferModal: React.FC<TransferModalProps> = ({ isOpen, onClose, senderUs
 
         {step === 3 && (
           <div className="p-12 text-center space-y-8">
-            <div className="w-24 h-24 bg-green-50 text-green-600 rounded-[32px] flex items-center justify-center mx-auto mb-2 animate-bounce">
-              <CheckCircle2 size={48} />
-            </div>
-            <div>
-              <h2 className="text-3xl font-display font-bold text-slate-900">Transfer Successful!</h2>
-              <p className="text-slate-500 font-medium mt-2 leading-relaxed">
-                Your payment of <span className="text-slate-900 font-bold">${parseFloat(formData.amount).toFixed(2)}</span> has been sent to the recipient.
-              </p>
-            </div>
+            {txnStatus === 'SUSPICIOUS' ? (
+              <>
+                <div className="w-24 h-24 bg-amber-50 text-amber-600 rounded-[32px] flex items-center justify-center mx-auto mb-2 animate-pulse">
+                  <ShieldAlert size={48} />
+                </div>
+                <div>
+                  <h2 className="text-3xl font-display font-bold text-slate-900">Security Review</h2>
+                  <p className="text-slate-500 font-medium mt-2 leading-relaxed">
+                    This transaction has been flagged for <span className="text-amber-600 font-bold">manual security review</span> due to unusual activity. 
+                    No funds have been moved yet. An administrator will review it shortly.
+                  </p>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="w-24 h-24 bg-green-50 text-green-600 rounded-[32px] flex items-center justify-center mx-auto mb-2 animate-bounce">
+                  <CheckCircle2 size={48} />
+                </div>
+                <div>
+                  <h2 className="text-3xl font-display font-bold text-slate-900">Transfer Successful!</h2>
+                  <p className="text-slate-500 font-medium mt-2 leading-relaxed">
+                    Your payment of <span className="text-slate-900 font-bold">${parseFloat(formData.amount).toFixed(2)}</span> has been sent to the recipient.
+                  </p>
+                </div>
+              </>
+            )}
             <Button fullWidth onClick={onClose} className="py-4">
-              Great, thanks!
+              {txnStatus === 'SUSPICIOUS' ? 'I Understand' : 'Great, thanks!'}
             </Button>
           </div>
         )}

@@ -39,6 +39,9 @@ public class Transaction {
     @Column(name = "reference_number", length = 50)
     private String referenceNumber;
 
+    @Column(length = 50)
+    private String category;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -52,6 +55,6 @@ public class Transaction {
     }
 
     public enum TransactionStatus {
-        PENDING, COMPLETED, FAILED
+        PENDING, COMPLETED, FAILED, SUSPICIOUS
     }
 }

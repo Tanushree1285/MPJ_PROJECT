@@ -8,6 +8,7 @@ import Transactions from './pages/Transactions'
 import AdminPanel from './pages/AdminPanel'
 import Profile from './pages/Profile'
 import Accounts from './pages/Accounts'
+import Vaults from './pages/Vaults'
 import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
 import AuditorPanel from './pages/AuditorPanel'
@@ -30,6 +31,7 @@ function AppRoutes() {
       <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
       <Route path="/transactions" element={<PrivateRoute><Transactions /></PrivateRoute>} />
       <Route path="/accounts" element={<PrivateRoute><Accounts /></PrivateRoute>} />
+      <Route path="/vaults" element={<PrivateRoute><Vaults /></PrivateRoute>} />
       <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
       <Route path="/admin" element={<PrivateRoute><AdminPanel /></PrivateRoute>} />
       <Route path="/auditor" element={<PrivateRoute><AuditorPanel /></PrivateRoute>} />

@@ -25,6 +25,17 @@ public class LogService {
                 .collect(java.util.stream.Collectors.toList());
     }
 
+    public void logAction(com.financehub.model.User user, String action, String details, String ipAddress, String status) {
+        Log log = Log.builder()
+                .user(user)
+                .action(action)
+                .details(details)
+                .ipAddress(ipAddress != null ? ipAddress : "system")
+                .status(status)
+                .build();
+        logRepository.save(log);
+    }
+
     private com.financehub.dto.LogResponse toResponse(Log log) {
         return com.financehub.dto.LogResponse.builder()
                 .id(log.getId())
