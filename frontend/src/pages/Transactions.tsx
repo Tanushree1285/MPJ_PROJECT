@@ -271,7 +271,7 @@ const Transactions: React.FC = () => {
                     <td className="px-6 py-5">
                       <p className={`font-display font-bold text-base ${tx.transactionType === 'DEPOSIT' ? 'text-green-600' : 'text-slate-900'
                         }`}>
-                        {tx.transactionType === 'DEPOSIT' ? '+' : '-'}${tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                        {tx.transactionType === 'DEPOSIT' ? '+' : '-'}₹{tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                       </p>
                     </td>
                     <td className="px-6 py-5">
@@ -324,7 +324,7 @@ const Transactions: React.FC = () => {
               <div className="flex justify-between items-center py-2 border-b border-slate-200/50">
                 <span className="text-sm font-bold text-slate-400 uppercase tracking-widest">Amount</span>
                 <span className={`text-xl font-display font-bold ${selectedTx.transactionType === 'DEPOSIT' ? 'text-green-600' : 'text-slate-900'}`}>
-                  {selectedTx.transactionType === 'DEPOSIT' ? '+' : '-'}${selectedTx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                  {selectedTx.transactionType === 'DEPOSIT' ? '+' : '-'}₹{selectedTx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                 </span>
               </div>
               <div className="flex justify-between items-center py-2 border-b border-slate-200/50">
