@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -15,12 +16,14 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     private final UserRepository userRepository;
+    private final JwtUtil jwtUtil;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -28,23 +31,26 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         
         String header = request.getHeader("Authorization");
         
-        if (header != null && header.startsWith("Bearer phase1-token-")) {
+        if (header != null && header.startsWith("Bearer ")) {
+            String token = header.substring(7);
             try {
-                String userIdStr = header.substring(20);
-                Long userId = Long.parseLong(userIdStr);
+                String username = jwtUtil.extractUsername(token);
                 
-                User user = userRepository.findById(userId).orElse(null);
-                
-                if (user != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                            user.getUsername(), null, Collections.emptyList());
+                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    User user = userRepository.findByUsername(username).orElse(null);
                     
-                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                    if (user != null && jwtUtil.validateToken(token, user.getUsername())) {
+                        List<SimpleGrantedAuthority> authorities = Collections.singletonList(
+                                new SimpleGrantedAuthority("ROLE_" + user.getRole().getRoleName()));
+
+                        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                                user.getUsername(), null, authorities);
+                        
+                        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                    }
                 }
             } catch (Exception e) {
-                // Silently fail auth and let filter chain continue (requests will fail downstream if @PreAuthorize is used, 
-                // but here we rely on permitAll() and logic in controllers)
                 logger.error("Could not set user authentication in security context", e);
             }
         }

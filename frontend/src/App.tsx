@@ -13,6 +13,7 @@ import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
 import AuditorPanel from './pages/AuditorPanel'
 import LandingPage from './pages/LandingPage'
+import QuickPay from './pages/QuickPay'
 import { AuthProvider, useAuth } from './context/AuthContext'
 
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -36,6 +37,7 @@ function AppRoutes() {
       <Route path="/admin" element={<PrivateRoute><AdminPanel /></PrivateRoute>} />
       <Route path="/auditor" element={<PrivateRoute><AuditorPanel /></PrivateRoute>} />
       <Route path="/" element={<LandingPage />} />
+      <Route path="/quick-pay" element={<QuickPay />} />
     </Routes>
   );
 }

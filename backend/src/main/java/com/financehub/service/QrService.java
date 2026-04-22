@@ -21,6 +21,9 @@ public class QrService {
     private final AccountService accountService;
     private final UserRepository userRepository;
 
+    @org.springframework.beans.factory.annotation.Value("${app.frontend.url:http://localhost:3000}")
+    private String frontendUrl;
+
     public String generateMyQr() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByUsername(username)
@@ -28,8 +31,7 @@ public class QrService {
 
         AccountResponse primaryAccount = accountService.getPrimaryByUserId(user.getId());
 
-        String qrData = String.format("{\"accountNumber\":\"%s\", \"fullName\":\"%s\"}",
-                primaryAccount.getAccountNumber(), user.getFullName());
+        String qrData = String.format("%s/quick-pay?account=%s", frontendUrl, primaryAccount.getAccountNumber());
 
         return generateQrBase64(qrData);
     }

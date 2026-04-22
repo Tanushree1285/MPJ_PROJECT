@@ -94,7 +94,7 @@ const Transactions: React.FC = () => {
       tx.referenceNumber,
       tx.description,
       tx.transactionType,
-      `$${tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
+      `₹${tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
       tx.status
     ]);
 
@@ -144,7 +144,7 @@ const Transactions: React.FC = () => {
       ['Reference No', tx.referenceNumber],
       ['Description', tx.description],
       ['Transaction Type', tx.transactionType],
-      ['Amount', `$${tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}`],
+      ['Amount', `₹${tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}`],
       ['Status', tx.status]
     ];
 

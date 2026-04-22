@@ -59,13 +59,21 @@ const QrPayments: React.FC = () => {
 
   const onScanSuccess = async (decodedText: string) => {
     try {
-      const data = JSON.parse(decodedText);
-      if (data.accountNumber) {
+      let accountToPay = null;
+      if (decodedText.startsWith('http')) {
+        const url = new URL(decodedText);
+        accountToPay = url.searchParams.get('pay') || url.searchParams.get('account');
+      } else {
+        const data = JSON.parse(decodedText);
+        accountToPay = data.accountNumber;
+      }
+
+      if (accountToPay) {
         if (scannerRef.current) {
           scannerRef.current.clear();
         }
         setScanning(false);
-        verifyReceiver(data.accountNumber);
+        verifyReceiver(accountToPay);
       }
     } catch (err) {
       // Not a valid FH JSON QR
@@ -220,7 +228,7 @@ const QrPayments: React.FC = () => {
                 {receiver && (
                   <div className="space-y-6 animate-slideDown">
                     <Input 
-                      label="Amount to Send (USD)" 
+                      label="Amount to Send (INR)" 
                       placeholder="0.00"
                       value={amount}
                       onChange={(e) => setAmount(e.target.value)}

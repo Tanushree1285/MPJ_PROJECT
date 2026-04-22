@@ -27,6 +27,7 @@ target/
 .mvn/
 .gradle/
 build/
+backend/apache-maven-3.9.6/
 
 # IDEs
 .vscode/

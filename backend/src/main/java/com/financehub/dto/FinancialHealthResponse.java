@@ -14,4 +14,5 @@ public class FinancialHealthResponse {
     private Double spendingGrowthRate; // percentage change
     private String insight; // AI-like text description
     private String alert; // Warning about unusual spending
+    private Double estimatedCarbonFootprintKg;
 }

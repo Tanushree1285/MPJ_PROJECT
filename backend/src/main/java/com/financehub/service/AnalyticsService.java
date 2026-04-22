@@ -38,6 +38,7 @@ public class AnalyticsService {
         // Category Breakdown
         Map<String, BigDecimal> categories = new HashMap<>();
         BigDecimal totalSpentThisMonth = BigDecimal.ZERO;
+        double carbonFootprint = 0.0;
 
         for (Transaction t : thisMonthTx) {
             if (t.getSenderAccount() != null && t.getSenderAccount().getId().equals(accountId) && 
@@ -46,6 +47,19 @@ public class AnalyticsService {
                 BigDecimal amount = t.getAmount();
                 categories.put(category, categories.getOrDefault(category, BigDecimal.ZERO).add(amount));
                 totalSpentThisMonth = totalSpentThisMonth.add(amount);
+                
+                // Calculate estimated CO2 footprint
+                double amt = amount.doubleValue();
+                switch (category) {
+                    case "Groceries": carbonFootprint += amt * 0.15; break;
+                    case "Utilities": carbonFootprint += amt * 0.40; break;
+                    case "Shopping": carbonFootprint += amt * 0.25; break;
+                    case "Entertainment": carbonFootprint += amt * 0.20; break;
+                    case "Rent": 
+                    case "Education": carbonFootprint += amt * 0.05; break;
+                    case "Transfer": break; // Transfers have negligible footprint
+                    default: carbonFootprint += amt * 0.10; break;
+                }
             }
         }
 
@@ -92,6 +106,7 @@ public class AnalyticsService {
                 .spendingGrowthRate(isReliableTrend ? growthRate : 0.0)
                 .insight(insight)
                 .alert(alert)
+                .estimatedCarbonFootprintKg(carbonFootprint)
                 .build();
     }
 

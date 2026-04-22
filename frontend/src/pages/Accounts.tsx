@@ -132,7 +132,7 @@ const Accounts: React.FC = () => {
               <div>
                 <p className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">Available Balance</p>
                 <h2 className="text-5xl font-display font-bold text-slate-900 tracking-tight">
-                  {primaryAccount?.currency || 'USD'} {(primaryAccount?.balance ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                  {'INR'} {(primaryAccount?.balance ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                 </h2>
               </div>
 

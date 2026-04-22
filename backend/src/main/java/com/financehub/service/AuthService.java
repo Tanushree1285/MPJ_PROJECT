@@ -3,6 +3,7 @@ package com.financehub.service;
 import com.financehub.dto.*;
 import com.financehub.exception.*;
 import com.financehub.model.*;
+import com.financehub.config.JwtUtil;
 import com.financehub.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,6 +30,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JavaMailSender mailSender;
     private final LogService logService;
+    private final JwtUtil jwtUtil;
 
     @Value("${app.frontend.url}")
     private String frontendUrl;
@@ -76,7 +78,7 @@ public class AuthService {
         logService.logAction(user, "REGISTER", "New user registered with email: " + user.getEmail(), ipAddress, "SUCCESS");
 
         return AuthResponse.builder()
-                .token("phase1-token-" + user.getId())
+                .token(jwtUtil.generateToken(user))
                 .email(user.getEmail())
                 .fullName(user.getFullName())
                 .role(user.getRole().getRoleName())
@@ -110,7 +112,7 @@ public class AuthService {
         logService.logAction(user, "LOGIN_SUCCESS", "User logged in successfully", ipAddress, "SUCCESS");
 
         return AuthResponse.builder()
-                .token("phase1-token-" + user.getId())
+                .token(jwtUtil.generateToken(user))
                 .email(user.getEmail())
                 .fullName(user.getFullName())
                 .role(user.getRole().getRoleName())

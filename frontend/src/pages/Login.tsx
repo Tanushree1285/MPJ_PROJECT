@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Mail, Lock, LogIn, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import Input from '../components/common/Input';
 import Button from '../components/common/Button';
@@ -14,6 +14,8 @@ const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirectUrl = searchParams.get('redirect') || '/dashboard';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,7 +26,7 @@ const Login: React.FC = () => {
       const response = await api.post('/auth/login', { email, password });
       login(response.data);
       toast.success('Login successful! Welcome back.');
-      navigate('/dashboard');
+      navigate(redirectUrl);
     } catch (err: any) {
       toast.error(err.message || 'Invalid email or password');
     } finally {

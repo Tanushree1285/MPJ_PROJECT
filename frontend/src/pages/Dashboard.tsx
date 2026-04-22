@@ -54,6 +54,7 @@ interface HealthData {
   spendingGrowthRate: number;
   insight: string;
   alert: string | null;
+  estimatedCarbonFootprintKg?: number;
 }
 
 const Dashboard: React.FC = () => {
@@ -132,6 +133,14 @@ const Dashboard: React.FC = () => {
     // Check for both id and userId just in case, but AuthContext should normalize it
     const uid = user?.id || (user as any)?.userId;
     if (uid) fetchData(uid);
+
+    const params = new URLSearchParams(window.location.search);
+    const payParam = params.get('pay');
+    if (payParam) {
+      setQuickTransferTo(payParam);
+      // Clean up URL to prevent refreshing causing re-fill
+      window.history.replaceState({}, '', window.location.pathname);
+    }
   }, [user]);
 
   const handleAddMoney = () => {
@@ -156,7 +165,7 @@ const Dashboard: React.FC = () => {
               <div>
                 <p className="text-slate-400 font-medium mb-1">Total Balance</p>
                 <h2 className="text-5xl font-display font-bold tracking-tight">
-                  {account?.currency || 'USD'} {(account?.balance ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                  {'INR'} {(account?.balance ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                 </h2>
                 <div className="flex items-center gap-2 mt-4 text-green-400 font-medium text-sm">
                   <div className="bg-green-50/10 p-1 rounded-full"><TrendingUp size={14} /></div>
@@ -212,7 +221,7 @@ const Dashboard: React.FC = () => {
               <div>
                 <p className="text-slate-500 text-sm font-medium">Monthly Income ({summary?.monthAndYear.split(' ')[0] || '...'})</p>
                 <p className="text-xl font-display font-bold text-slate-900">
-                  {summary ? `${summary.currency} ${summary.monthlyIncome.toLocaleString(undefined, { minimumFractionDigits: 2 })}` : '$0.00'}
+                  {summary ? `₹{summary.currency} ${summary.monthlyIncome.toLocaleString(undefined, { minimumFractionDigits: 2 })}` : '₹0.00'}
                 </p>
               </div>
             </div>
@@ -223,7 +232,7 @@ const Dashboard: React.FC = () => {
               <div>
                 <p className="text-slate-500 text-sm font-medium">Monthly Expense ({summary?.monthAndYear.split(' ')[0] || '...'})</p>
                 <p className="text-xl font-display font-bold text-slate-900">
-                  {summary ? `${summary.currency} ${summary.monthlyExpense.toLocaleString(undefined, { minimumFractionDigits: 2 })}` : '$0.00'}
+                  {summary ? `₹{summary.currency} ${summary.monthlyExpense.toLocaleString(undefined, { minimumFractionDigits: 2 })}` : '₹0.00'}
                 </p>
               </div>
             </div>
@@ -276,6 +285,45 @@ const Dashboard: React.FC = () => {
         <div className="space-y-8">
           {/* AI Financial Health Widget */}
           <HealthScoreWidget data={healthData} loading={loading} />
+
+          {/* ESG Carbon Footprint Tracker */}
+          {!loading && healthData && (
+            <div className="glass-card p-6 rounded-3xl border-none shadow-premium relative overflow-hidden text-white bg-gradient-to-br from-emerald-800 to-green-900 group">
+               <div className="absolute top-0 right-0 p-8 opacity-10 transform group-hover:scale-110 transition-transform duration-500">
+                  <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
+               </div>
+               
+               <h3 className="font-display font-bold text-green-100 mb-6 flex items-center gap-2">
+                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                 ESG Carbon Footprint
+               </h3>
+               
+               <div className="flex items-end gap-3 mb-4">
+                 <span className="text-5xl font-display font-black tracking-tight">{healthData.estimatedCarbonFootprintKg?.toFixed(1) || '0.0'}</span>
+                 <span className="text-xl font-bold text-green-400 mb-1">kg CO₂</span>
+               </div>
+               
+               <p className="text-green-200/80 text-sm font-medium leading-relaxed mb-6">
+                 Estimated from your recent spending velocity and categories.
+               </p>
+               
+               {(healthData.estimatedCarbonFootprintKg || 0) < 100 ? (
+                 <div className="bg-emerald-500/20 border border-emerald-500/30 rounded-2xl p-4 flex items-center gap-4 backdrop-blur-sm">
+                   <div className="w-10 h-10 bg-emerald-500/20 text-emerald-300 rounded-full flex items-center justify-center shrink-0">
+                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 6 9 17 4 12"/></svg>
+                   </div>
+                   <div>
+                     <p className="text-xs text-emerald-400 font-bold uppercase tracking-widest mb-0.5">Unlocked Badge</p>
+                     <p className="font-display font-bold text-white text-sm">Eco-Friendly Journey</p>
+                   </div>
+                 </div>
+               ) : (
+                 <div className="h-2 w-full bg-black/20 rounded-full overflow-hidden">
+                   <div className="h-full bg-green-500 rounded-full" style={{ width: `₹{Math.min(((healthData.estimatedCarbonFootprintKg || 0) / 300) * 100, 100)}%` }} />
+                 </div>
+               )}
+            </div>
+          )}
 
           {/* Quick Transfer */}
           <div className="glass-card p-6 rounded-3xl border-none shadow-premium">

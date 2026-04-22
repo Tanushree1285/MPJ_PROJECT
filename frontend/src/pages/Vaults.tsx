@@ -60,13 +60,13 @@ const STORAGE_KEY = 'fh_vaults_v2';
 ────────────────────────────────────────────── */
 const loadVaults = (userId: number): Vault[] => {
   try {
-    const raw = localStorage.getItem(`${STORAGE_KEY}_${userId}`);
+    const raw = localStorage.getItem(`₹{STORAGE_KEY}_${userId}`);
     return raw ? JSON.parse(raw) : [];
   } catch { return []; }
 };
 
 const saveVaults = (userId: number, vaults: Vault[]) => {
-  localStorage.setItem(`${STORAGE_KEY}_${userId}`, JSON.stringify(vaults));
+  localStorage.setItem(`₹{STORAGE_KEY}_${userId}`, JSON.stringify(vaults));
 };
 
 /* ──────────────────────────────────────────────
@@ -102,7 +102,7 @@ function LiquidBar({ percent, color }: { percent: number; color: string }) {
         className="absolute inset-y-0 left-0 rounded-2xl"
         style={{ background: color }}
         initial={{ width: 0 }}
-        animate={{ width: `${pct}%` }}
+        animate={{ width: `₹{pct}%` }}
         transition={{ duration: 1.2, ease: 'easeOut' }}
       >
         {/* Wave shimmer */}
@@ -234,7 +234,7 @@ const Vaults: React.FC = () => {
       toast.success('🎉 Goal reached! Vault complete!', { duration: 4000, icon: '🏆' });
       setTimeout(() => setCelebrating(null), 3000);
     } else {
-      toast.success(`Added $${actual.toFixed(2)} to "${showDeposit.name}"`);
+      toast.success(`Added ₹${actual.toFixed(2)} to "${showDeposit.name}"`);
     }
   };
 
@@ -283,7 +283,7 @@ const Vaults: React.FC = () => {
 
             <div className="flex flex-col sm:flex-row gap-6">
               <div className="text-center p-6 bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 min-w-[130px]">
-                <p className="text-3xl font-display font-black">${totalSaved.toLocaleString(undefined, { minimumFractionDigits: 0 })}</p>
+                <p className="text-3xl font-display font-black">₹{totalSaved.toLocaleString(undefined, { minimumFractionDigits: 0 })}</p>
                 <p className="text-white/60 text-[10px] font-black uppercase tracking-widest mt-1">Total Saved</p>
               </div>
               <div className="text-center p-6 bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 min-w-[130px]">
@@ -298,9 +298,9 @@ const Vaults: React.FC = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           {[
             { label: 'Active Vaults', value: vaults.length, icon: <PiggyBank size={20} />, color: 'text-primary-600', bg: 'bg-primary-50' },
-            { label: 'Total Goal', value: `$${totalTarget.toLocaleString(undefined, { maximumFractionDigits: 0 })}`, icon: <Target size={20} />, color: 'text-indigo-600', bg: 'bg-indigo-50' },
+            { label: 'Total Goal', value: `₹${totalTarget.toLocaleString(undefined, { maximumFractionDigits: 0 })}`, icon: <Target size={20} />, color: 'text-indigo-600', bg: 'bg-indigo-50' },
             { label: 'Completed', value: completed, icon: <Trophy size={20} />, color: 'text-amber-600', bg: 'bg-amber-50' },
-            { label: 'Avg Progress', value: vaults.length ? `${Math.round((totalSaved / Math.max(totalTarget, 1)) * 100)}%` : '0%', icon: <TrendingUp size={20} />, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+            { label: 'Avg Progress', value: vaults.length ? `₹{Math.round((totalSaved / Math.max(totalTarget, 1)) * 100)}%` : '0%', icon: <TrendingUp size={20} />, color: 'text-emerald-600', bg: 'bg-emerald-50' },
           ].map((s, i) => (
             <motion.div key={s.label} variants={item} className="glass-card p-6 rounded-[28px] border-none shadow-premium bg-white">
               <div className={`w-12 h-12 ${s.bg} rounded-2xl flex items-center justify-center ${s.color} mb-4`}>
@@ -397,12 +397,12 @@ const Vaults: React.FC = () => {
                         <div>
                           <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Saved</p>
                           <p className="text-3xl font-display font-black text-slate-900">
-                            <AnimatedNumber value={vault.savedAmount} prefix="$" />
+                            <AnimatedNumber value={vault.savedAmount} prefix="₹" />
                           </p>
                         </div>
                         <div className="text-right">
                           <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Target</p>
-                          <p className="text-lg font-bold text-slate-500">${vault.targetAmount.toLocaleString()}</p>
+                          <p className="text-lg font-bold text-slate-500">₹{vault.targetAmount.toLocaleString()}</p>
                         </div>
                       </div>
 
@@ -419,7 +419,7 @@ const Vaults: React.FC = () => {
                         <div className="flex items-center gap-2 p-4 bg-slate-50 rounded-2xl border border-slate-100">
                           <Lock size={16} className="text-slate-400 shrink-0" />
                           <p className="text-slate-500 font-bold text-sm">
-                            <span className="text-slate-800">${remaining.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span> remaining
+                            <span className="text-slate-800">₹{remaining.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span> remaining
                           </p>
                         </div>
                       )}
@@ -530,7 +530,7 @@ const Vaults: React.FC = () => {
                 <div>
                   <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Target Amount</p>
                   <div className="relative">
-                    <span className="absolute left-5 top-1/2 -translate-y-1/2 font-black text-slate-300 text-lg">$</span>
+                    <span className="absolute left-5 top-1/2 -translate-y-1/2 font-black text-slate-300 text-lg">₹</span>
                     <input
                       type="number"
                       placeholder="5,000"
@@ -560,7 +560,7 @@ const Vaults: React.FC = () => {
                   <span className="text-3xl">{newEmoji}</span>
                   <div>
                     <p className="font-black text-base">{newName || 'Your Vault'}</p>
-                    <p className="text-white/70 text-xs font-bold">{newTarget ? `$0 / $${parseFloat(newTarget).toLocaleString()}` : 'Set a target'}</p>
+                    <p className="text-white/70 text-xs font-bold">{newTarget ? `₹0 / ₹${parseFloat(newTarget).toLocaleString()}` : 'Set a target'}</p>
                   </div>
                 </div>
 
@@ -620,7 +620,7 @@ const Vaults: React.FC = () => {
                   />
                   <div className="flex justify-between text-xs">
                     <span className="text-slate-400 font-bold">Available Balance</span>
-                    <span className="font-bold text-emerald-600">${(account?.balance ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                    <span className="font-bold text-emerald-600">₹{(account?.balance ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                   </div>
                 </div>
 
@@ -638,7 +638,7 @@ const Vaults: React.FC = () => {
                           onClick={() => setDepositAmt(String(val.toFixed(2)))}
                           className="py-2.5 bg-slate-50 hover:bg-primary-50 hover:text-primary-700 rounded-xl text-slate-700 font-bold text-xs border border-slate-100 hover:border-primary-200 transition-all"
                         >
-                          {amt === 'Remaining' ? 'Max' : `$${amt}`}
+                          {amt === 'Remaining' ? 'Max' : `₹${amt}`}
                         </button>
                       );
                     })}
@@ -647,7 +647,7 @@ const Vaults: React.FC = () => {
 
                 {/* Amount input */}
                 <div className="relative">
-                  <span className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 font-black text-2xl">$</span>
+                  <span className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 font-black text-2xl">₹</span>
                   <input
                     type="number"
                     placeholder="0.00"

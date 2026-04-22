@@ -235,6 +235,44 @@ const Profile: React.FC = () => {
                   <h3 className="text-3xl font-display font-bold text-slate-900 mb-2">Security & Privacy</h3>
                   <p className="text-slate-500 font-medium mb-10">Keep your account secure with advanced controls</p>
                   
+                  {/* Security Strength Widget */}
+                  <div className="mb-10 bg-gradient-to-r from-slate-900 to-slate-800 p-8 rounded-[32px] text-white flex flex-col md:flex-row items-center gap-8 shadow-2xl relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-green-500/20 blur-3xl rounded-full -mr-10 -mt-10 animate-pulse" />
+                    
+                    <div className="relative w-32 h-32 shrink-0">
+                      <svg viewBox="0 0 36 36" className="w-full h-full transform -rotate-90">
+                        <path strokeDasharray="100, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="3" />
+                        <motion.path 
+                          initial={{ strokeDasharray: "0, 100" }}
+                          animate={{ strokeDasharray: "85, 100" }}
+                          transition={{ duration: 1.5, ease: "easeOut" }}
+                          d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" 
+                          fill="none" stroke="#22c55e" strokeWidth="3" strokeLinecap="round" 
+                        />
+                      </svg>
+                      <div className="absolute inset-0 flex flex-col items-center justify-center">
+                        <span className="text-3xl font-display font-black text-green-400">85</span>
+                        <span className="text-[10px] uppercase tracking-widest text-slate-400 font-bold opacity-80">Score</span>
+                      </div>
+                    </div>
+                    
+                    <div className="relative z-10 flex-1">
+                       <h4 className="text-2xl font-display font-bold mb-2">Excellent Security Strength</h4>
+                       <p className="text-slate-400 text-sm font-medium mb-4">Your account is highly secure. You have strong authentication measures actively protecting your assets.</p>
+                       <div className="flex flex-wrap gap-3">
+                          <span className="px-3 py-1 bg-green-500/20 text-green-400 border border-green-500/30 rounded-full text-xs font-bold flex items-center gap-1">
+                            <CheckCircle size={12} /> Password Age: Strong
+                          </span>
+                          <span className="px-3 py-1 bg-green-500/20 text-green-400 border border-green-500/30 rounded-full text-xs font-bold flex items-center gap-1">
+                            <CheckCircle size={12} /> Unknown Logins: 0
+                          </span>
+                          <span className="px-3 py-1 bg-orange-500/20 text-orange-400 border border-orange-500/30 rounded-full text-xs font-bold flex items-center gap-1">
+                            <AlertTriangle size={12} /> Biometrics: Opted Out
+                          </span>
+                       </div>
+                    </div>
+                  </div>
+
                   <div className="space-y-6">
                     <div className="flex items-center justify-between p-8 bg-slate-50/50 rounded-[32px] border border-slate-100/50 group hover:border-primary-200 transition-all">
                       <div className="flex items-center gap-5">
