@@ -32,7 +32,7 @@ public class AccountService {
                 .accountNumber(accountNumber)
                 .accountType(Account.AccountType.valueOf(request.getAccountType().toUpperCase()))
                 .balance(java.math.BigDecimal.ZERO)
-                .currency("USD")
+                .currency("INR")
                 .isActive(true)
                 .isPrimary(isFirstAccount)
                 .build();

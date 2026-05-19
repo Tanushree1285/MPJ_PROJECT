@@ -69,7 +69,7 @@ public class AuthService {
                 .accountNumber(accountNumber)
                 .accountType(Account.AccountType.SAVINGS)
                 .balance(new java.math.BigDecimal("1000.00"))
-                .currency("USD")
+                .currency("INR")
                 .isActive(true)
                 .build();
         account = accountRepository.save(account);

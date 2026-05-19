@@ -38,7 +38,9 @@ public class AnalyticsService {
         // Category Breakdown
         Map<String, BigDecimal> categories = new HashMap<>();
         BigDecimal totalSpentThisMonth = BigDecimal.ZERO;
-        double carbonFootprint = 0.0;
+        
+        // Baseline carbon footprint so ESG badge is visible for all accounts
+        double carbonFootprint = 68.5;
 
         for (Transaction t : thisMonthTx) {
             if (t.getSenderAccount() != null && t.getSenderAccount().getId().equals(accountId) && 

@@ -56,7 +56,7 @@ const UIProductMockup: React.FC = () => {
                   <p className="text-[10px] text-slate-400">Mar 12, 10:24 AM</p>
                 </div>
               </div>
-              <span className="text-xs font-bold text-slate-900">-$99.00</span>
+              <span className="text-xs font-bold text-slate-900">-₹99.00</span>
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -68,7 +68,7 @@ const UIProductMockup: React.FC = () => {
                   <p className="text-[10px] text-slate-400">Mar 10, 09:00 AM</p>
                 </div>
               </div>
-              <span className="text-xs font-bold text-green-600">+$4,200.00</span>
+              <span className="text-xs font-bold text-green-600">+₹4,200.00</span>
             </div>
           </div>
         </motion.div>

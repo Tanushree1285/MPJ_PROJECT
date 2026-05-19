@@ -60,13 +60,13 @@ const STORAGE_KEY = 'fh_vaults_v2';
 ────────────────────────────────────────────── */
 const loadVaults = (userId: number): Vault[] => {
   try {
-    const raw = localStorage.getItem(`₹{STORAGE_KEY}_${userId}`);
+    const raw = localStorage.getItem(`${STORAGE_KEY}_${userId}`);
     return raw ? JSON.parse(raw) : [];
   } catch { return []; }
 };
 
 const saveVaults = (userId: number, vaults: Vault[]) => {
-  localStorage.setItem(`₹{STORAGE_KEY}_${userId}`, JSON.stringify(vaults));
+  localStorage.setItem(`${STORAGE_KEY}_${userId}`, JSON.stringify(vaults));
 };
 
 /* ──────────────────────────────────────────────
@@ -102,7 +102,7 @@ function LiquidBar({ percent, color }: { percent: number; color: string }) {
         className="absolute inset-y-0 left-0 rounded-2xl"
         style={{ background: color }}
         initial={{ width: 0 }}
-        animate={{ width: `₹{pct}%` }}
+        animate={{ width: `${pct}%` }}
         transition={{ duration: 1.2, ease: 'easeOut' }}
       >
         {/* Wave shimmer */}
@@ -300,7 +300,7 @@ const Vaults: React.FC = () => {
             { label: 'Active Vaults', value: vaults.length, icon: <PiggyBank size={20} />, color: 'text-primary-600', bg: 'bg-primary-50' },
             { label: 'Total Goal', value: `₹${totalTarget.toLocaleString(undefined, { maximumFractionDigits: 0 })}`, icon: <Target size={20} />, color: 'text-indigo-600', bg: 'bg-indigo-50' },
             { label: 'Completed', value: completed, icon: <Trophy size={20} />, color: 'text-amber-600', bg: 'bg-amber-50' },
-            { label: 'Avg Progress', value: vaults.length ? `₹{Math.round((totalSaved / Math.max(totalTarget, 1)) * 100)}%` : '0%', icon: <TrendingUp size={20} />, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+            { label: 'Avg Progress', value: vaults.length ? `${Math.round((totalSaved / Math.max(totalTarget, 1)) * 100)}%` : '0%', icon: <TrendingUp size={20} />, color: 'text-emerald-600', bg: 'bg-emerald-50' },
           ].map((s, i) => (
             <motion.div key={s.label} variants={item} className="glass-card p-6 rounded-[28px] border-none shadow-premium bg-white">
               <div className={`w-12 h-12 ${s.bg} rounded-2xl flex items-center justify-center ${s.color} mb-4`}>
@@ -611,7 +611,7 @@ const Vaults: React.FC = () => {
                   <div className="flex justify-between text-sm">
                     <span className="font-bold text-slate-500">Vault Progress</span>
                     <span className="font-bold text-slate-900">
-                      ${showDeposit.savedAmount.toLocaleString()} / ${showDeposit.targetAmount.toLocaleString()}
+                      ₹{showDeposit.savedAmount.toLocaleString()} / ₹{showDeposit.targetAmount.toLocaleString()}
                     </span>
                   </div>
                   <LiquidBar 

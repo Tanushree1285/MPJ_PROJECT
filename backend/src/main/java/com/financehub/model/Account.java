@@ -30,7 +30,7 @@ public class Account {
 
     @Builder.Default
     @Column(nullable = false, length = 10)
-    private String currency = "USD";
+    private String currency = "INR";
 
     @Builder.Default
     @Column(name = "is_active", nullable = false)

@@ -207,13 +207,13 @@ const Accounts: React.FC = () => {
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-slate-500 font-medium">Total Income ({summary?.monthAndYear || '...'})</span>
                   <span className="font-bold text-green-600">
-                    +{summary ? `${summary.currency} ${summary.monthlyIncome.toLocaleString(undefined, { minimumFractionDigits: 2 })}` : '$0.00'}
+                    +{summary ? `${summary.currency} ${summary.monthlyIncome.toLocaleString(undefined, { minimumFractionDigits: 2 })}` : '₹0.00'}
                   </span>
                 </div>
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-slate-500 font-medium">Total Spending ({summary?.monthAndYear || '...'})</span>
                   <span className="font-bold text-red-600">
-                    -{summary ? `${summary.currency} ${summary.monthlyExpense.toLocaleString(undefined, { minimumFractionDigits: 2 })}` : '$0.00'}
+                    -{summary ? `${summary.currency} ${summary.monthlyExpense.toLocaleString(undefined, { minimumFractionDigits: 2 })}` : '₹0.00'}
                   </span>
                 </div>
                 <div className="pt-4 border-t border-slate-50 flex justify-center">

@@ -96,7 +96,7 @@ public class TransactionService {
         logService.logAction(
                 senderAccount.getUser(),
                 "TRANSFER",
-                "Transferred $" + request.getAmount() + " from "
+                "Transferred ₹" + request.getAmount() + " from "
                         + senderAccount.getAccountNumber() + " to "
                         + receiverAccount.getAccountNumber() + " | Ref: " + refNumber,
                 ipAddress,

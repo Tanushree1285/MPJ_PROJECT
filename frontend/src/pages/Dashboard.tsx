@@ -221,7 +221,7 @@ const Dashboard: React.FC = () => {
               <div>
                 <p className="text-slate-500 text-sm font-medium">Monthly Income ({summary?.monthAndYear.split(' ')[0] || '...'})</p>
                 <p className="text-xl font-display font-bold text-slate-900">
-                  {summary ? `₹{summary.currency} ${summary.monthlyIncome.toLocaleString(undefined, { minimumFractionDigits: 2 })}` : '₹0.00'}
+                  {summary ? `${summary.currency} ${summary.monthlyIncome.toLocaleString(undefined, { minimumFractionDigits: 2 })}` : '₹0.00'}
                 </p>
               </div>
             </div>
@@ -232,7 +232,7 @@ const Dashboard: React.FC = () => {
               <div>
                 <p className="text-slate-500 text-sm font-medium">Monthly Expense ({summary?.monthAndYear.split(' ')[0] || '...'})</p>
                 <p className="text-xl font-display font-bold text-slate-900">
-                  {summary ? `₹{summary.currency} ${summary.monthlyExpense.toLocaleString(undefined, { minimumFractionDigits: 2 })}` : '₹0.00'}
+                  {summary ? `${summary.currency} ${summary.monthlyExpense.toLocaleString(undefined, { minimumFractionDigits: 2 })}` : '₹0.00'}
                 </p>
               </div>
             </div>
@@ -267,7 +267,7 @@ const Dashboard: React.FC = () => {
                     <div className="text-right">
                       <p className={`font-display font-bold text-lg ${tx.transactionType === 'DEPOSIT' ? 'text-green-600' : 'text-slate-900'
                         }`}>
-                        {tx.transactionType === 'DEPOSIT' ? '+' : '-'}${tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                        {tx.transactionType === 'DEPOSIT' ? '+' : '-'}₹{tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                       </p>
                       <p className={`text-[10px] uppercase tracking-widest font-bold mt-1 ${tx.status === 'COMPLETED' ? 'text-green-500' : 'text-orange-500'
                         }`}>
@@ -319,7 +319,7 @@ const Dashboard: React.FC = () => {
                  </div>
                ) : (
                  <div className="h-2 w-full bg-black/20 rounded-full overflow-hidden">
-                   <div className="h-full bg-green-500 rounded-full" style={{ width: `₹{Math.min(((healthData.estimatedCarbonFootprintKg || 0) / 300) * 100, 100)}%` }} />
+                   <div className="h-full bg-green-500 rounded-full" style={{ width: `${Math.min(((healthData.estimatedCarbonFootprintKg || 0) / 300) * 100, 100)}%` }} />
                  </div>
                )}
             </div>
